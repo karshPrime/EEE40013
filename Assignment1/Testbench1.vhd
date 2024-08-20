@@ -1,4 +1,3 @@
--- VHDL Test Bench Created from source file multiplier.vhd -- 15:36:36 09/01/2003
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -10,136 +9,141 @@ use std.textio.all;
 entity testbench is
 end testbench;
 
-architecture behavior of testbench is 
+architecture behavior of testbench is
 
--- ports of UUT
-signal Clock    :  std_logic := '0';
-signal A        :  unsigned(15 downto 0) := (others => '0');
-signal B        :  unsigned(15 downto 0) := (others => '0');
-signal Q        :  unsigned(31 downto 0) := (others => '0');
-signal Start    :  std_logic := '0';
-signal Complete :  std_logic := '0';
-signal reset    :  std_logic := '0';
-  
-  
---  File to log results to
-file logFile : TEXT;
+    -- ports of UUT
+    signal Clock    : STD_LOGIC := '0';
+    signal A        : unsigned(15 downto 0) := (others => '0');
+    signal B        : unsigned(15 downto 0) := (others => '0');
+    signal Q        : unsigned(31 downto 0) := (others => '0');
+    signal Start    : STD_LOGIC := '0';
+    signal Complete : STD_LOGIC := '0';
+    signal Reset    : STD_LOGIC := '0';
 
-constant clockHigh   : time := 50 ns; 
-constant clockLow    : time := 50 ns; 
-constant clockPeriod : time := clockHigh + clockLow; 
-    
-signal   simComplete : boolean := false;
+    -- File to log results to
+    file logFile : TEXT;
+
+    constant clockHigh : TIME := 50 ns;
+    constant clockLow : TIME := 50 ns;
+    constant clockPeriod : TIME := clockHigh + clockLow;
+
+    signal simComplete : BOOLEAN := false;
 
 begin
 
-   --****************************************************
-   -- Clock Generator
-   --
-   ClockGen:
-   process
+    --**********************************************************************************************
+    -- Clock Generator
+    ClockGen : process
+    begin
+        while not simComplete loop
+            Clock <= '0';
+            wait for clockHigh;
+            Clock <= '1';
+            wait for clockLow;
+        end loop;
 
-   begin
-      while not simComplete loop
-         clock <= '0';  wait for clockHigh;
-         clock <= '1';  wait for clockLow;
-      end loop;
+        wait; -- stop process looping
+    end process ClockGen;
 
-      wait; -- stop process looping
-   end process ClockGen;
+    --*****************************************************************************
+    -- Stimulus Generator
+    Stimulus : process
 
-   --****************************************************
-   -- Stimulus Generator
-   --
-   Stimulus:
-   process
+        --*************************************************************************
+        -- Write a message to the logfile & transcript
+        -- message => string to write
+        procedure writeMsg (message : STRING) is
+            variable assertMsgBuffer : STRING(1 to 4096); -- string for assert message
+            variable writeMsgBuffer : line; -- buffer for write messages
+        begin
+            write(writeMsgBuffer, message);
+            assertMsgBuffer(writeMsgBuffer.all'range) := writeMsgBuffer.all;
+            writeline(logFile, writeMsgBuffer);
 
-   --*******************************************************
-   -- Write a message to the logfile & transcript
-   --
-   --  message => string to write
-   --
-   procedure writeMsg ( message : string
-                      ) is
+            deallocate(writeMsgBuffer);
+            report assertMsgBuffer severity note;
+        end;
 
-   variable assertMsgBuffer : String(1 to 4096); -- string for assert message
-   variable writeMsgBuffer : line; -- buffer for write messages
+        --*************************************************************************
+        -- Perform multiplication and log the results
+        --  stimulusA, stimulusB => values to multiply
+        procedure doMultiply(stimulusA : unsigned(15 downto 0);
+                             stimulusB : unsigned(15 downto 0))
+        is
+            variable assertMsgBuffer : STRING(1 to 4096); -- string for assert message
+            variable writeMsgBuffer : line; -- buffer for write messages
+        begin
+            A <= stimulusA;
+            B <= stimulusB;
 
-   begin
-      write(writeMsgBuffer, message);
-      assertMsgBuffer(writeMsgBuffer.all'range) := writeMsgBuffer.all;
-      writeline(logFile, writeMsgBuffer);
-      deallocate(writeMsgBuffer);
-      report assertMsgBuffer severity note;
-   end;
+            Start <= '1';
+            wait until rising_edge(Clock);
+            Start <= '0';
 
-   procedure doMultiply( stimulusA : unsigned(15 downto 0);
-                         stimulusB : unsigned(15 downto 0)
-                         ) is
+            wait until Complete = '1'; -- Wait for the complete signal to go high
 
-   variable assertMsgBuffer : String(1 to 4096); -- string for assert message
-   variable writeMsgBuffer  : line; -- buffer for write messages
-   variable expectedQ       : unsigned(31 downto 0);
-   variable actualQ         : unsigned(31 downto 0);
+            write(writeMsgBuffer, STRING'("A = "), left);
+            write(writeMsgBuffer, to_integer(stimulusA));
 
-   begin
+            write(writeMsgBuffer, STRING'(", | B = "), left);
+            write(writeMsgBuffer, to_integer(stimulusB));
 
-      write( writeMsgBuffer, string'("A = "), left );
-      write( writeMsgBuffer, to_integer(stimulusA) );
-      write( writeMsgBuffer, string'(", B = "), left );
-      write( writeMsgBuffer, to_integer(stimulusB) );
+            write(writeMsgBuffer, STRING'(" | ExpectedQ = "), left);
+            write(writeMsgBuffer, to_integer(stimulusA * stimulusB));
 
-      --  Fill out with your test sequence for the multiplier
+            write(writeMsgBuffer, STRING'(" | GeneratedQ = "), left);
+            write(writeMsgBuffer, to_integer(Q));
 
-      assertMsgBuffer(writeMsgBuffer.all'range) := writeMsgBuffer.all;
-      writeline(logFile, writeMsgBuffer);
-      deallocate(writeMsgBuffer);
-      report assertMsgBuffer severity note;
-   end;
+            assertMsgBuffer(writeMsgBuffer.all'range) := writeMsgBuffer.all;
+            writeline(logFile, writeMsgBuffer);
+            deallocate(writeMsgBuffer);
+            report assertMsgBuffer severity note;
+        end;
 
-   variable openStatus : file_open_status;
+        variable openStatus : file_open_status;
 
-   begin -- Stimulus
+    begin -- Stimulus
 
-      file_open(openStatus, logFile, "results.txt", WRITE_MODE);
+        file_open(openStatus, logFile, "results.txt", WRITE_MODE);
 
-      writeMsg( string'("Simulation starting.") );
+        writeMsg(STRING'("Simulation starting."));
 
-      -- initial reset
-      A     <= (others => '0');
-      B     <= (others => '0');
-      Start <= '0';
+        -- Initial reset
+        A <= (others => '0');
+        B <= (others => '0');
+        Start <= '0';
+        Reset <= '1';
+        wait for 10 ns;
+        Reset <= '0';
+        wait until falling_edge(Clock);
 
-      reset <= '1';
-      wait for 10 ns;
-      reset <= '0';
-      wait until falling_edge(Clock);
-      
+        -- Test cases
+        doMultiply("0000000000111010", "0000000000111111"); -- 58 x 63
+        doMultiply("0000000000001111", "0000111111111111"); -- 15 x 1023
+        doMultiply("0000000000000000", "1111111111111111"); -- 0  x MAX
+        doMultiply("0000000000000010", "0101010101010101"); -- 2  x something; shift 1 left
+        doMultiply("0000000000010000", "0000111000110010"); -- 16 x something; shift 4 left
+        doMultiply("0000000000000100", "0011011111101100"); -- 4  x something; shift 2 left
 
-      -- Test cases - modify as needed.
-      doMultiply( "0000000000000010", "0000000000000010" );
+        wait for 20 ns;
 
-      wait for 20 ns;
+        writeMsg(STRING'("Simulation completed."));
+        file_close(logFile);
 
-      writeMsg( string'("Simulation completed.") );
+        simComplete <= true;
+        wait;
 
-      file_close(logFile);
+    end process Stimulus;
 
-      simComplete <= true; -- stop clock & simulation
-
-      wait;
-
-   end process Stimulus;
-
-   uut: entity work.Multiplier1Cycle
-   port map (
-       reset    => reset,
-       Clock    => Clock,
-       A        => A,
-       B        => B,
-       Q        => Q,
-       Start    => Start,
-       Complete => Complete
-       );
-
+    uut : entity work.Multiplier1Cycle
+    port map
+    (
+        Reset    => Reset,
+        Clock    => Clock,
+        A        => A,
+        B        => B,
+        Q        => Q,
+        Start    => Start,
+        Complete => Complete
+    );
 end;
