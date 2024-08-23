@@ -135,7 +135,8 @@ begin
 
     end process Stimulus;
 
-    uut : entity work.Multiplier1Cycle
+    -- uut : entity work.MultiplierCycle1
+    uut : entity work.MultiplierCycles
     port map
     (
         Reset    => Reset,
