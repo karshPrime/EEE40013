@@ -1,4 +1,3 @@
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -12,10 +11,10 @@ end testbench;
 architecture behavior of testbench is
 
     -- ports of UUT
-    signal Clock    : STD_LOGIC := '0';
-    signal A        : unsigned(15 downto 0) := (others => '0');
-    signal B        : unsigned(15 downto 0) := (others => '0');
-    signal Q        : unsigned(31 downto 0) := (others => '0');
+    signal Clock : STD_LOGIC := '0';
+    signal A : unsigned(15 downto 0) := (others => '0');
+    signal B : unsigned(15 downto 0) := (others => '0');
+    signal Q : unsigned(31 downto 0) := (others => '0');
     signal Start    : STD_LOGIC := '0';
     signal Complete : STD_LOGIC := '0';
     signal Reset    : STD_LOGIC := '0';
@@ -23,15 +22,14 @@ architecture behavior of testbench is
     -- File to log results to
     file logFile : TEXT;
 
-    constant clockHigh : TIME := 50 ns;
-    constant clockLow : TIME := 50 ns;
+    constant clockHigh   : TIME := 50 ns;
+    constant clockLow    : TIME := 50 ns;
     constant clockPeriod : TIME := clockHigh + clockLow;
-
-    signal simComplete : BOOLEAN := false;
+    signal simComplete   : BOOLEAN := false;
 
 begin
 
-    --**********************************************************************************************
+    --**************************************************************************
     -- Clock Generator
     ClockGen : process
     begin
@@ -45,16 +43,16 @@ begin
         wait; -- stop process looping
     end process ClockGen;
 
-    --*****************************************************************************
+    --**************************************************************************
     -- Stimulus Generator
     Stimulus : process
 
-        --*************************************************************************
+        --**********************************************************************
         -- Write a message to the logfile & transcript
         -- message => string to write
         procedure writeMsg (message : STRING) is
-            variable assertMsgBuffer : STRING(1 to 4096); -- string for assert message
-            variable writeMsgBuffer : line; -- buffer for write messages
+            variable assertMsgBuffer : STRING(1 to 4096);
+            variable writeMsgBuffer : line;
         begin
             write(writeMsgBuffer, message);
             assertMsgBuffer(writeMsgBuffer.all'range) := writeMsgBuffer.all;
@@ -63,24 +61,22 @@ begin
             deallocate(writeMsgBuffer);
             report assertMsgBuffer severity note;
         end;
-
-        --*************************************************************************
+        --**********************************************************************
         -- Perform multiplication and log the results
-        --  stimulusA, stimulusB => values to multiply
+        -- stimulusA, stimulusB => values to multiply
         procedure doMultiply(stimulusA : unsigned(15 downto 0);
                              stimulusB : unsigned(15 downto 0))
         is
-            variable assertMsgBuffer : STRING(1 to 4096); -- string for assert message
-            variable writeMsgBuffer : line; -- buffer for write messages
+            variable assertMsgBuffer : STRING(1 to 4096);
+            variable writeMsgBuffer : line;
         begin
             A <= stimulusA;
             B <= stimulusB;
-
             Start <= '1';
-            wait until rising_edge(Clock);
-            Start <= '0';
-
-            wait until Complete = '1'; -- Wait for the complete signal to go high
+            wait until falling_edge(Clock);
+            Start <= ‘0';
+            -- Wait for result
+            wait until falling_edge(Clock) and Complete = '1';
 
             write(writeMsgBuffer, STRING'("A = "), left);
             write(writeMsgBuffer, to_integer(stimulusA));
@@ -93,6 +89,12 @@ begin
 
             write(writeMsgBuffer, STRING'(" | GeneratedQ = "), left);
             write(writeMsgBuffer, to_integer(Q));
+
+            if Q = stimulusA * stimulusB then
+                write(writeMsgBuffer, STRING'(" [PASS]"), left);
+            else
+                write(writeMsgBuffer, STRING'(" [FAIL]"), left);
+            end if;
 
             assertMsgBuffer(writeMsgBuffer.all'range) := writeMsgBuffer.all;
             writeline(logFile, writeMsgBuffer);
@@ -118,12 +120,12 @@ begin
         wait until falling_edge(Clock);
 
         -- Test cases
-        doMultiply("0000000000111010", "0000000000111111"); -- 58 x 63
-        doMultiply("0000000000001111", "0000111111111111"); -- 15 x 1023
-        doMultiply("0000000000000000", "1111111111111111"); -- 0  x MAX
-        doMultiply("0000000000000010", "0101010101010101"); -- 2  x something; shift 1 left
-        doMultiply("0000000000010000", "0000111000110010"); -- 16 x something; shift 4 left
-        doMultiply("0000000000000100", "0011011111101100"); -- 4  x something; shift 2 left
+        doMultiply("0000000000000000", "1111111111111111");-- 0 * MAX
+        doMultiply("0000000000111010", "0000000000111111");-- 58 * 63
+        doMultiply("1111100000111010", "0101110000011111");-- 63546 * 23583
+        doMultiply("1111111111111111", "1111111111111111");-- MAX * MAX
+        doMultiply("0000000000000010", "0101010101010101");-- 2 * -; shiftleft 1
+        doMultiply("0000000000010000", "0000111000110010");-- 16* _; shiftleft 4
 
         wait for 20 ns;
 
@@ -135,7 +137,6 @@ begin
 
     end process Stimulus;
 
-    -- uut : entity work.MultiplierCycle1
     uut : entity work.MultiplierCycles
     port map
     (
