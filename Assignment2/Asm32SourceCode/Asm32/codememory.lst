@@ -1,0 +1,98 @@
+00000000 |                             org     0x0000              ; Bra #-8 (FFFFFFFE)
+00000000 |                 
+00000000 | 14201000                    swap    R1,R2               ; swap  R1 ,R0 ,R2 
+00000004 | 34201234                    movh    R1,#0x1234          ; swap  R1 ,R0 ,#4660
+00000008 |                 
+00000008 | 00201000                    mov     R1,R2               ; add   R1 ,R0 ,R2 
+0000000c | 20201234                    mov     R1,#0x1234          ; add   R1 ,R0 ,#4660
+00000010 |                 
+00000010 | 00211000                    add     R1,R2               ; add   R1 ,R1 ,R2 
+00000014 | 04211000                    sub     R1,R2               ; sub   R1 ,R1 ,R2 
+00000018 | 08211000                    and     R1,R2               ; and   R1 ,R1 ,R2 
+0000001c | 0C211000                    or      R1,R2               ; or    R1 ,R1 ,R2 
+00000020 | 10211000                    eor     R1,R2               ; xor   R1 ,R1 ,R2 
+00000024 | 10211000                    xor     R1,R2               ; xor   R1 ,R1 ,R2 
+00000028 | 1C211000                    mul     R1,R2               ; mul   R1 ,R1 ,R2 
+0000002c |                 
+0000002c | 20211234                    add     R1,#0x1234          ; add   R1 ,R1 ,#4660
+00000030 | 24211234                    sub     R1,#0x1234          ; sub   R1 ,R1 ,#4660
+00000034 | 28211234                    and     R1,#0x1234          ; and   R1 ,R1 ,#4660
+00000038 | 2C211234                    or      R1,#0x1234          ; or    R1 ,R1 ,#4660
+0000003c | 30211234                    eor     R1,#0x1234          ; xor   R1 ,R1 ,#4660
+00000040 | 30211234                    xor     R1,#0x1234          ; xor   R1 ,R1 ,#4660
+00000044 | 3C211234                    mul     R1,#0x1234          ; mul   R1 ,R1 ,#4660
+00000048 |                 
+00000048 | 00221800                    add     R1,R2,R3            ; add   R1 ,R2 ,R3 
+0000004c | 04221800                    sub     R1,R2,R3            ; sub   R1 ,R2 ,R3 
+00000050 | 08221800                    and     R1,R2,R3            ; and   R1 ,R2 ,R3 
+00000054 | 0C221800                    or      R1,R2,R3            ; or    R1 ,R2 ,R3 
+00000058 | 10221800                    eor     R1,R2,R3            ; xor   R1 ,R2 ,R3 
+0000005c | 10221800                    xor     R1,R2,R3            ; xor   R1 ,R2 ,R3 
+00000060 | 1C221800                    mul     R1,R2,R3            ; mul   R1 ,R2 ,R3 
+00000064 |                 
+00000064 | 20221234                    add     R1,R2,#0x1234       ; add   R1 ,R2 ,#4660
+00000068 | 24221234                    sub     R1,R2,#0x1234       ; sub   R1 ,R2 ,#4660
+0000006c | 28221234                    and     R1,R2,#0x1234       ; and   R1 ,R2 ,#4660
+00000070 | 2C221234                    or      R1,R2,#0x1234       ; or    R1 ,R2 ,#4660
+00000074 | 30221234                    eor     R1,R2,#0x1234       ; xor   R1 ,R2 ,#4660
+00000078 | 30221234                    xor     R1,R2,#0x1234       ; xor   R1 ,R2 ,#4660
+0000007c | 34201234                    movh    R1,#0x1234          ; swap  R1 ,R0 ,#4660
+00000080 | 3C221234                    mul     R1,R2,#0x1234       ; mul   R1 ,R2 ,#4660
+00000084 |                 
+00000084 | 40221234                    ld      R1,0x1234(R2)       ; Ld R1 ,4660(R2 )
+00000088 | 40220000                    ld      R1,(R2)             ; Ld R1 ,0(R2 )
+0000008c | 40201234                    ld      R1,0x1234           ; Ld R1 ,4660(R0 )
+00000090 | 40021234                    jmp     0x1234(R2)          ; Jmp 4660(R2 )
+00000094 | 40001234                    jmp     0x1234              ; Jmp 4660(R0 )
+00000098 | 40020000                    jmp     (R2)                ; Jmp 0(R2 )
+0000009c | 401F0000                    rts                         ; Jmp 0(R31)
+000000a0 |                 
+000000a0 | 60221234                    st      R1,0x1234(R2)       ; St R1 ,R2 ,#4660
+000000a4 | 60220000                    st      R1,(R2)             ; St R1 ,R2 ,#0
+000000a8 | 60201234                    st      R1,0x1234           ; St R1 ,R0 ,#4660
+000000ac |                 
+000000ac |                  label                                  
+000000ac | 807FFFFF                    bra     label               ; Bra #-4 (FFFFFFFF)
+000000b0 | 817FFFFE                    bcs     label               ; Bcs #-8 (FFFFFFFE)
+000000b4 | 817FFFFD                    blo     label               ; Bcs #-12 (FFFFFFFD)
+000000b8 | 827FFFFC                    beq     label               ; Beq #-16 (FFFFFFFC)
+000000bc | 837FFFFB                    bvs     label               ; Bvs #-20 (FFFFFFFB)
+000000c0 |                 
+000000c0 | 847FFFFA                    bmi     label               ; Bmi #-24 (FFFFFFFA)
+000000c4 | 857FFFF9                    blt     label               ; Blt #-28 (FFFFFFF9)
+000000c8 | 867FFFF8                    ble     label               ; Ble #-32 (FFFFFFF8)
+000000cc | 877FFFF7                    bls     label               ; Bls #-36 (FFFFFFF7)
+000000d0 |                 
+000000d0 | 80FFFFF6                    bsr     label               ; Bsr #-40 (FFFFFFF6)
+000000d4 | 81FFFFF5                    bcc     label               ; Bcc #-44 (FFFFFFF5)
+000000d8 | 81FFFFF4                    bhs     label               ; Bcc #-48 (FFFFFFF4)
+000000dc | 82FFFFF3                    bne     label               ; Bne #-52 (FFFFFFF3)
+000000e0 | 83FFFFF2                    bvc     label               ; Bvc #-56 (FFFFFFF2)
+000000e4 |                 
+000000e4 | 84FFFFF1                    bpl     label               ; Bpl #-60 (FFFFFFF1)
+000000e8 | 85FFFFF0                    bge     label               ; Bge #-64 (FFFFFFF0)
+000000ec | 86FFFFEF                    bgt     label               ; Bgt #-68 (FFFFFFEF)
+000000f0 | 87FFFFEE                    bhi     label               ; Bhi #-72 (FFFFFFEE)
+000000f4 |                 
+000000f4 |                 
+000000f4 |                 ; Tutorial Example
+000000f4 | 20200000                    mov     r1,#0               ; add   R1 ,R0 ,#0
+000000f8 | 20400001                    mov     r2,#1               ; add   R2 ,R0 ,#1
+000000fc |                  loop1                                  
+000000fc | 00211000                    add     r1,r1,r2            ; add   R1 ,R1 ,R2 
+00000100 | 807FFFFE                    bra     loop1               ; Bra #-8 (FFFFFFFE)
+00000104 |                 
+
+
+0 Errors detected in pass 1
+0 Warnings detected in pass 1
+0 Errors detected in pass 2
+0 Warnings detected in pass 2
+
+
+  Symbol Table
+*******************************************************
+  Value  : Type  : Symbol 
+000000AC :  Text : label
+000000FC :  Text : loop1
+*******************************************************

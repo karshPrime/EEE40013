@@ -1,0 +1,22 @@
+00000000 | 14400000         main       mov     R2,#flags           
+00000004 | 14201FFE                    mov     R1,#8190            
+00000008 |                 
+00000000 |                             data                        
+00000000 | 0A               flags      dc.b    10                  
+00000001 | 14               d          dc.b    20                  
+00000002 |                 
+
+
+0 Errors detected in pass 1
+0 Warnings detected in pass 1
+0 Errors detected in pass 2
+0 Warnings detected in pass 2
+
+
+  Symbol Table
+*******************************************************
+  Value  : Type  : Symbol 
+00000001 :  Data : d
+00000000 :  Data : flags
+00000000 :  Text : main
+*******************************************************
