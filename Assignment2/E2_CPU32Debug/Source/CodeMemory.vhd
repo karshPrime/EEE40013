@@ -51,7 +51,7 @@ impure function loadROM (fileName : in string) return ROMType is
    begin
       -- Open file
 --    Use this if you want to store the source file in another directory
---      write(filepath, string'("/home/peter/Documents/Work/EEE40013_20_S2/Laboratory/E2_CPU32Debug/Simulate/"));
+      write(filepath, string'("C:/Users/tapod/Documents/WorkAssignment2/E2_CPU32Debug/Synthesis/"));
       write(filepath, fileName);
       file_open(openStatus, memoryFile, filepath.all, READ_MODE);
       if openStatus/=OPEN_OK then

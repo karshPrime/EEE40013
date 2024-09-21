@@ -10,3 +10,8 @@
 # documenation
 Assignment2/E2_CPU32Debug/CPU Description.pdf
 Assignment2/E2_CPU32Debug/VHDL - Unsigned and Signed.pdf
+
+# Run Vivado Simulation
+/Assignment2/E2_CPU32Debug/Synthesis/Synthesis.cache
+/Assignment2/E2_CPU32Debug/Synthesis/Synthesis.ip_user_files
+/Assignment2/E2_CPU32Debug/Synthesis/Synthesis.sim
